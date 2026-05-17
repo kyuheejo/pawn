@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawn — Design System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* ============================================
+           DESIGN TOKENS
+           ============================================ */
+        :root {
+            /* — Background — */
+            --bg-void:      #0a0a0a;
+            --bg-surface:    #111111;
+            --bg-raised:     #1a1a1a;
+            --bg-elevated:   #222222;
+            --bg-hover:      #2a2a2a;
+
+            /* — Foreground — */
+            --fg-primary:    #e8e8e8;
+            --fg-secondary:  #999999;
+            --fg-muted:      #555555;
+            --fg-ghost:      #333333;
+
+            /* — Accent: Amber (terminal cursor) — */
+            --accent:        #f59e0b;
+            --accent-dim:    #b45309;
+            --accent-glow:   rgba(245, 158, 11, 0.15);
+            --accent-bright: #fbbf24;
+
+            /* — Semantic — */
+            --success:       #22c55e;
+            --error:         #ef4444;
+            --info:          #3b82f6;
+            --warning:       #f59e0b;
+
+            /* — Border — */
+            --border-subtle:  #1f1f1f;
+            --border-default: #2a2a2a;
+            --border-strong:  #444444;
+            --border-accent:  var(--accent);
+
+            /* — Typography — */
+            --font-mono:    'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+            --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            /* — Spacing (4px base) — */
+            --sp-1: 4px;
+            --sp-2: 8px;
+            --sp-3: 12px;
+            --sp-4: 16px;
+            --sp-5: 20px;
+            --sp-6: 24px;
+            --sp-8: 32px;
+            --sp-10: 40px;
+            --sp-12: 48px;
+            --sp-16: 64px;
+            --sp-20: 80px;
+            --sp-24: 96px;
+
+            /* — Radius — */
+            --radius-none: 0px;
+            --radius-sm:   2px;
+            --radius-md:   4px;
+            --radius-lg:   6px;
+
+            /* — Transitions — */
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-fast: 150ms;
+            --duration-normal: 250ms;
+
+            /* — Grid — */
+            --max-width: 1200px;
+            --grid-gap: 24px;
+        }
+
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--bg-void);
+            color: var(--fg-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--bg-void);
+        }
+
+        /* ============================================
+           DESIGN SYSTEM LAYOUT
+           ============================================ */
+        .ds-container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-6);
+        }
+
+        .ds-header {
+            text-align: center;
+            margin-bottom: var(--sp-24);
+            padding-bottom: var(--sp-16);
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .ds-header pre.ascii-logo {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            line-height: 1.1;
+            color: var(--accent);
+            margin-bottom: var(--sp-8);
+            display: inline-block;
+            text-align: left;
+        }
+
+        .ds-header h1 {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--fg-secondary);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-top: var(--sp-4);
+        }
+
+        .ds-section {
+            margin-bottom: var(--sp-24);
+        }
+
+        .ds-section-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: var(--sp-3);
+        }
+
+        .ds-section-line {
+            height: 1px;
+            background: var(--border-default);
+            margin-bottom: var(--sp-10);
+        }
+
+        .ds-section-desc {
+            font-size: 13px;
+            color: var(--fg-secondary);
+            margin-bottom: var(--sp-8);
+            max-width: 600px;
+        }
+
+        .ds-grid {
+            display: grid;
+            gap: var(--sp-4);
+        }
+
+        .ds-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .ds-grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .ds-grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .ds-grid-5 { grid-template-columns: repeat(5, 1fr); }
+        .ds-grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+        @media (max-width: 768px) {
+            .ds-grid-4, .ds-grid-5, .ds-grid-6 { grid-template-columns: repeat(2, 1fr); }
+            .ds-grid-3 { grid-template-columns: 1fr; }
+        }
+
+        .ds-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: var(--sp-2);
+        }
+
+        .ds-value {
+            font-size: 11px;
+            color: var(--fg-secondary);
+            font-family: var(--font-mono);
+        }
+
+        /* ============================================
+           COLOR SWATCHES
+           ============================================ */
+        .swatch {
+            height: 80px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-default);
+            display: flex;
+            align-items: flex-end;
+            padding: var(--sp-2);
+        }
+
+        .swatch-info {
+            padding: var(--sp-2) 0;
+        }
+
+        /* ============================================
+           TYPOGRAPHY SPECIMENS
+           ============================================ */
+        .type-specimen {
+            padding: var(--sp-6) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .type-specimen:last-child {
+            border-bottom: none;
+        }
+
+        .type-meta {
+            font-size: 10px;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-2);
+        }
+
+        /* Display styles */
+        .t-display {
+            font-family: var(--font-mono);
+            font-size: 72px;
+            font-weight: 800;
+            line-height: 1.0;
+            letter-spacing: -0.03em;
+            color: var(--fg-primary);
+        }
+
+        .t-h1 {
+            font-family: var(--font-mono);
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .t-h2 {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+
+        .t-h3 {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .t-h4 {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .t-body {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--fg-secondary);
+        }
+
+        .t-body-sans {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--fg-secondary);
+        }
+
+        .t-small {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--fg-muted);
+        }
+
+        .t-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--fg-secondary);
+        }
+
+        .t-code {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--accent);
+            background: var(--bg-raised);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn-row {
+            display: flex;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: var(--sp-6);
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--fg-primary);
+            color: var(--bg-void);
+            padding: var(--sp-3) var(--sp-6);
+            border: 1px solid var(--fg-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-void);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--fg-primary);
+            padding: var(--sp-3) var(--sp-6);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--fg-primary);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--fg-secondary);
+            padding: var(--sp-3) var(--sp-6);
+            border: 1px solid transparent;
+        }
+
+        .btn-ghost:hover {
+            color: var(--fg-primary);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--bg-void);
+            padding: var(--sp-3) var(--sp-6);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-bright);
+            border-color: var(--accent-bright);
+        }
+
+        .btn-sm {
+            font-size: 11px;
+            padding: var(--sp-2) var(--sp-4);
+        }
+
+        .btn-lg {
+            font-size: 14px;
+            padding: var(--sp-4) var(--sp-8);
+        }
+
+        .btn .kbd {
+            font-size: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-weight: 400;
+        }
+
+        /* ============================================
+           CARDS
+           ============================================ */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            padding: var(--sp-6);
+            transition: border-color var(--duration-fast) var(--ease-out);
+        }
+
+        .card:hover {
+            border-color: var(--border-strong);
+        }
+
+        .card-title {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: var(--sp-2);
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--fg-secondary);
+            line-height: 1.6;
+        }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-glow);
+            padding: 2px 8px;
+            margin-top: var(--sp-4);
+        }
+
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .nav-demo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--sp-4) var(--sp-6);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            margin-bottom: var(--sp-6);
+        }
+
+        .nav-logo {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .nav-logo .pawn-symbol {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--sp-6);
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--fg-secondary);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: color var(--duration-fast);
+        }
+
+        .nav-links a:hover {
+            color: var(--fg-primary);
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+        }
+
+        /* ============================================
+           TERMINAL / CODE BLOCK
+           ============================================ */
+        .terminal {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding: var(--sp-3) var(--sp-4);
+            background: var(--bg-raised);
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--fg-ghost);
+        }
+
+        .terminal-dot.red { background: #ff5f57; }
+        .terminal-dot.yellow { background: #febc2e; }
+        .terminal-dot.green { background: #28c840; }
+
+        .terminal-title {
+            font-size: 11px;
+            color: var(--fg-muted);
+            margin-left: var(--sp-2);
+        }
+
+        .terminal-body {
+            padding: var(--sp-4);
+            line-height: 1.8;
+        }
+
+        .terminal-line {
+            display: flex;
+            gap: var(--sp-2);
+        }
+
+        .terminal-prompt {
+            color: var(--accent);
+            user-select: none;
+        }
+
+        .terminal-cmd {
+            color: var(--fg-primary);
+        }
+
+        .terminal-output {
+            color: var(--fg-muted);
+        }
+
+        .terminal-highlight {
+            color: var(--success);
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: var(--accent);
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* ============================================
+           ASCII ART COMPONENT
+           ============================================ */
+        .ascii-art {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.15;
+            color: var(--fg-muted);
+            white-space: pre;
+            text-align: center;
+            padding: var(--sp-8);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+        }
+
+        .ascii-art .highlight {
+            color: var(--accent);
+        }
+
+        /* ============================================
+           BADGE / TAG
+           ============================================ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+        }
+
+        .badge-default {
+            color: var(--fg-secondary);
+            background: var(--bg-raised);
+            border: 1px solid var(--border-default);
+        }
+
+        .badge-accent {
+            color: var(--accent);
+            background: var(--accent-glow);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-success {
+            color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .badge-dot::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* ============================================
+           DIVIDER
+           ============================================ */
+        .divider {
+            border: none;
+            height: 1px;
+            background: var(--border-default);
+            margin: var(--sp-12) 0;
+        }
+
+        .divider-dashed {
+            border: none;
+            height: 0;
+            border-top: 1px dashed var(--border-default);
+            margin: var(--sp-8) 0;
+        }
+
+        /* ============================================
+           STATS ROW
+           ============================================ */
+        .stats-row {
+            display: flex;
+            gap: var(--sp-12);
+            padding: var(--sp-8) 0;
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--fg-primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: var(--sp-2);
+        }
+
+        /* ============================================
+           INPUT
+           ============================================ */
+        .input-demo {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-4);
+            max-width: 400px;
+        }
+
+        .input {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            color: var(--fg-primary);
+            padding: var(--sp-3) var(--sp-4);
+            outline: none;
+            transition: border-color var(--duration-fast);
+        }
+
+        .input:focus {
+            border-color: var(--accent);
+        }
+
+        .input::placeholder {
+            color: var(--fg-ghost);
+        }
+
+        .input-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--fg-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ============================================
+           FEATURE ROW (icon + text)
+           ============================================ */
+        .feature-row {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-4);
+            padding: var(--sp-4) 0;
+        }
+
+        .feature-icon {
+            font-size: 18px;
+            color: var(--accent);
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+            font-family: var(--font-mono);
+        }
+
+        .feature-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: var(--sp-1);
+        }
+
+        .feature-text p {
+            font-size: 13px;
+            color: var(--fg-secondary);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+           SPACING VISUALIZATION
+           ============================================ */
+        .spacing-demo {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--sp-3);
+            flex-wrap: wrap;
+        }
+
+        .spacing-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .spacing-bar {
+            background: var(--accent-glow);
+            border: 1px solid var(--accent-dim);
+            width: 40px;
+        }
+
+        /* ============================================
+           HERO DEMO
+           ============================================ */
+        .hero-demo {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            padding: var(--sp-20) var(--sp-12);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(245, 158, 11, 0.02) 1px,
+                    rgba(245, 158, 11, 0.02) 2px
+                );
+            pointer-events: none;
+        }
+
+        .hero-demo .ascii-pawn {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            line-height: 1.15;
+            color: var(--accent);
+            white-space: pre;
+            margin-bottom: var(--sp-8);
+            opacity: 0.6;
+        }
+
+        .hero-demo h1 {
+            font-family: var(--font-mono);
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: var(--sp-4);
+        }
+
+        .hero-demo h1 .accent {
+            color: var(--accent);
+        }
+
+        .hero-demo p {
+            font-size: 15px;
+            color: var(--fg-secondary);
+            max-width: 500px;
+            margin: 0 auto var(--sp-8);
+            line-height: 1.7;
+        }
+
+        .hero-ctas {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-4);
+        }
+
+        /* ============================================
+           SCANLINE TEXTURE OVERLAY
+           ============================================ */
+        .scanlines {
+            position: relative;
+        }
+
+        .scanlines::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px
+            );
+            pointer-events: none;
+        }
+
+        /* ============================================
+           GRID BACKGROUND PATTERN
+           ============================================ */
+        .grid-bg {
+            background-image:
+                linear-gradient(var(--border-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ============================================
+           FOOTER PATTERN
+           ============================================ */
+        .footer-demo {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            padding: var(--sp-10) var(--sp-8);
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--sp-10);
+        }
+
+        .footer-col h5 {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--fg-secondary);
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: var(--sp-2);
+        }
+
+        .footer-col a {
+            font-size: 13px;
+            color: var(--fg-muted);
+            text-decoration: none;
+            transition: color var(--duration-fast);
+        }
+
+        .footer-col a:hover {
+            color: var(--fg-primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-default);
+            padding-top: var(--sp-6);
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--fg-ghost);
+        }
+    </style>
+</head>
+<body>
+
+<div class="ds-container">
+
+    <!-- ==========================================
+         HEADER
+         ========================================== -->
+    <header class="ds-header">
+        <pre class="ascii-logo">
+ ██████╗  █████╗ ██╗    ██╗███╗   ██╗
+ ██╔══██╗██╔══██╗██║    ██║████╗  ██║
+ ██████╔╝███████║██║ █╗ ██║██╔██╗ ██║
+ ██╔═══╝ ██╔══██║██║███╗██║██║╚██╗██║
+ ██║     ██║  ██║╚███╔███╔╝██║ ╚████║
+ ╚═╝     ╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═══╝
+        </pre>
+        <h1>Design System v0.1</h1>
+    </header>
+
+    <!-- ==========================================
+         01. COLORS
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">01 / Colors</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">
+            Near-black backgrounds with high-contrast text. Amber accent
+            evokes a terminal cursor — the single warm element in a cold interface.
+        </p>
+
+        <div class="ds-section-title" style="margin-top: var(--sp-8); font-size: 10px; color: var(--fg-muted);">Backgrounds</div>
+        <div class="ds-grid ds-grid-5" style="margin-bottom: var(--sp-8);">
+            <div>
+                <div class="swatch" style="background: var(--bg-void);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Void</div>
+                    <div class="ds-value">#0a0a0a</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--bg-surface);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Surface</div>
+                    <div class="ds-value">#111111</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--bg-raised);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Raised</div>
+                    <div class="ds-value">#1a1a1a</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--bg-elevated);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Elevated</div>
+                    <div class="ds-value">#222222</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--bg-hover);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Hover</div>
+                    <div class="ds-value">#2a2a2a</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ds-section-title" style="font-size: 10px; color: var(--fg-muted);">Foreground</div>
+        <div class="ds-grid ds-grid-4" style="margin-bottom: var(--sp-8);">
+            <div>
+                <div class="swatch" style="background: var(--fg-primary);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Primary</div>
+                    <div class="ds-value">#e8e8e8</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--fg-secondary);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Secondary</div>
+                    <div class="ds-value">#999999</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--fg-muted);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Muted</div>
+                    <div class="ds-value">#555555</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--fg-ghost);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Ghost</div>
+                    <div class="ds-value">#333333</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ds-section-title" style="font-size: 10px; color: var(--fg-muted);">Accent & Semantic</div>
+        <div class="ds-grid ds-grid-6">
+            <div>
+                <div class="swatch" style="background: var(--accent);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Accent</div>
+                    <div class="ds-value">#f59e0b</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--accent-dim);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Accent Dim</div>
+                    <div class="ds-value">#b45309</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--accent-glow); border-color: rgba(245,158,11,0.3);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Accent Glow</div>
+                    <div class="ds-value">15% alpha</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--success);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Success</div>
+                    <div class="ds-value">#22c55e</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--error);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Error</div>
+                    <div class="ds-value">#ef4444</div>
+                </div>
+            </div>
+            <div>
+                <div class="swatch" style="background: var(--info);"></div>
+                <div class="swatch-info">
+                    <div class="ds-label">Info</div>
+                    <div class="ds-value">#3b82f6</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         02. TYPOGRAPHY
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">02 / Typography</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">
+            JetBrains Mono for everything — headings, body, labels, code.
+            Inter as a fallback for long-form body text when readability matters more than aesthetic.
+        </p>
+
+        <div class="type-specimen">
+            <div class="type-meta">Display — JetBrains Mono 800 / 72px / -0.03em</div>
+            <div class="t-display">Ship your<br>agent.</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">H1 — JetBrains Mono 700 / 48px / -0.02em</div>
+            <div class="t-h1">Deploy + Sell in one click</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">H2 — JetBrains Mono 700 / 32px / -0.01em</div>
+            <div class="t-h2">Built for skill makers</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">H3 — JetBrains Mono 600 / 24px</div>
+            <div class="t-h3">One subscription, every agent</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">H4 — JetBrains Mono 600 / 18px</div>
+            <div class="t-h4">We handle hosting, payments, infrastructure</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">Body Mono — JetBrains Mono 400 / 15px / 1.7</div>
+            <div class="t-body">If you've written a Claude skill or agent harness, you can list it on Pawn as a sellable agent in one click. We handle the hosting, payments, and infrastructure.</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">Body Sans — Inter 400 / 16px / 1.7 (readability fallback)</div>
+            <div class="t-body-sans">If you've written a Claude skill or agent harness, you can list it on Pawn as a sellable agent in one click. We handle the hosting, payments, and infrastructure.</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">Small — JetBrains Mono 400 / 13px</div>
+            <div class="t-small">Buyers get one subscription that works across every agent on the platform.</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">Label — JetBrains Mono 700 / 11px / 0.15em / uppercase</div>
+            <div class="t-label">Available Agents</div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">Inline Code</div>
+            <div class="t-body">Run <span class="t-code">pawn deploy</span> to list your agent on the marketplace.</div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         03. SPACING
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">03 / Spacing</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">4px base unit. Tight spacing for that dense, information-rich terminal feel.</p>
+
+        <div class="spacing-demo">
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 4px;"></div>
+                <div class="ds-value">4</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 8px;"></div>
+                <div class="ds-value">8</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 12px;"></div>
+                <div class="ds-value">12</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 16px;"></div>
+                <div class="ds-value">16</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 24px;"></div>
+                <div class="ds-value">24</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 32px;"></div>
+                <div class="ds-value">32</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 48px;"></div>
+                <div class="ds-value">48</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 64px;"></div>
+                <div class="ds-value">64</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 80px;"></div>
+                <div class="ds-value">80</div>
+            </div>
+            <div class="spacing-block">
+                <div class="spacing-bar" style="height: 96px;"></div>
+                <div class="ds-value">96</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         04. BUTTONS
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">04 / Buttons</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">
+            All-caps monospace with keyboard shortcut badges (a la Parallel AI).
+            No border-radius — sharp edges only.
+        </p>
+
+        <div class="btn-row">
+            <button class="btn btn-primary btn-lg">List Your Agent <span class="kbd">L</span></button>
+            <button class="btn btn-secondary btn-lg">Explore Agents</button>
+            <button class="btn btn-accent btn-lg">Get Started <span class="kbd">G</span></button>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-primary">List Your Agent</button>
+            <button class="btn btn-secondary">Explore Agents</button>
+            <button class="btn btn-ghost">Learn More &rarr;</button>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-primary btn-sm">Deploy</button>
+            <button class="btn btn-secondary btn-sm">View Docs</button>
+            <button class="btn btn-ghost btn-sm">Cancel</button>
+        </div>
+
+        <div class="btn-row" style="margin-top: var(--sp-4);">
+            <span class="badge badge-default">v0.1.0</span>
+            <span class="badge badge-accent badge-dot">Live</span>
+            <span class="badge badge-success badge-dot">Deployed</span>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         05. NAVIGATION
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">05 / Navigation</div>
+        <div class="ds-section-line"></div>
+
+        <nav class="nav-demo">
+            <div class="nav-logo"><span class="pawn-symbol">&#x265F;</span> pawn</div>
+            <ul class="nav-links">
+                <li><a href="#" class="active">Agents</a></li>
+                <li><a href="#">Docs</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
+            <div style="display: flex; gap: var(--sp-3);">
+                <button class="btn btn-ghost btn-sm">Log In</button>
+                <button class="btn btn-primary btn-sm">List Agent <span class="kbd">L</span></button>
+            </div>
+        </nav>
+    </section>
+
+    <!-- ==========================================
+         06. TERMINAL / CODE
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">06 / Terminal</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">
+            The hero interaction — show the one-click deploy experience.
+        </p>
+
+        <div class="terminal" style="max-width: 640px;">
+            <div class="terminal-header">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+                <span class="terminal-title">~/my-agent</span>
+            </div>
+            <div class="terminal-body">
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-cmd">pawn deploy ./my-skill</span>
+                </div>
+                <div class="terminal-output">&nbsp;</div>
+                <div class="terminal-output">  Packaging agent...</div>
+                <div class="terminal-output">  Uploading to Pawn registry...</div>
+                <div class="terminal-output">  Setting up payments...</div>
+                <div class="terminal-output">&nbsp;</div>
+                <div class="terminal-highlight">  &#x2713; Agent "my-skill" is live!</div>
+                <div class="terminal-highlight">  &#x2713; Storefront: pawn.market/agents/my-skill</div>
+                <div class="terminal-output">&nbsp;</div>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-cursor"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         07. CARDS
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">07 / Cards</div>
+        <div class="ds-section-line"></div>
+
+        <div class="ds-grid ds-grid-3">
+            <div class="card">
+                <div class="card-title">SEO Blog Writer</div>
+                <div class="card-desc">Generates keyword-optimized blog posts with internal linking and schema markup.</div>
+                <div class="card-tag">Skill</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Code Reviewer</div>
+                <div class="card-desc">Multi-pass code review with severity ratings, SOLID checks, and performance analysis.</div>
+                <div class="card-tag">Harness</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Data Pipeline</div>
+                <div class="card-desc">ETL orchestration agent that connects to any database and builds transformation flows.</div>
+                <div class="card-tag">Agent</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         08. ASCII ART
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">08 / ASCII Art</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">
+            The chess pawn as ASCII art — core brand element.
+            Used as a subtle background or hero decoration.
+        </p>
+
+        <div class="ascii-art">
+<span class="highlight">            _  _
+           ( `   )_
+          (    )    `)
+        (_   (_ .  _) _)
+                                    </span>
+           <span class="highlight"> |</span>
+            <span class="highlight">|</span>
+          <span class="highlight">__|__</span>
+         <span class="highlight">/     \</span>
+        <span class="highlight">/       \</span>
+       <span class="highlight">|         |</span>
+        <span class="highlight">\       /</span>
+         <span class="highlight">\_____/</span>
+        <span class="highlight">/       \</span>
+       <span class="highlight">/         \</span>
+      <span class="highlight">|           |</span>
+      <span class="highlight">|           |</span>
+       <span class="highlight">\         /</span>
+      <span class="highlight">__\_______/__</span>
+     <span class="highlight">/             \</span>
+    <span class="highlight">/_______________\</span>
+        </div>
+
+        <div style="margin-top: var(--sp-6);"></div>
+
+        <div class="ascii-art" style="font-size: 10px; color: var(--fg-ghost);">
+     _______________________________________________
+    |                                               |
+    |   <span class="highlight">skill</span> ──&gt; <span style="color: var(--fg-secondary);">pawn deploy</span> ──&gt; <span style="color: var(--success);">$$$</span>              |
+    |                                               |
+    |   You build it. We sell it.                   |
+    |_______________________________________________|
+        </div>
+    </section>
+
+    <!-- ==========================================
+         09. STATS
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">09 / Stats</div>
+        <div class="ds-section-line"></div>
+
+        <div class="stats-row">
+            <div class="stat">
+                <div class="stat-value">142</div>
+                <div class="stat-label">Agents Listed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">2.4k</div>
+                <div class="stat-label">Subscribers</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">$89k</div>
+                <div class="stat-label">Paid to Creators</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">&lt;30s</div>
+                <div class="stat-label">Deploy Time</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         10. INPUTS
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">10 / Inputs</div>
+        <div class="ds-section-line"></div>
+
+        <div class="input-demo">
+            <div>
+                <div class="input-label">Email</div>
+                <input class="input" type="email" placeholder="you@example.com" style="width: 100%;">
+            </div>
+            <div>
+                <div class="input-label">Agent Name</div>
+                <input class="input" type="text" placeholder="my-awesome-agent" style="width: 100%;">
+            </div>
+            <button class="btn btn-primary" style="align-self: flex-start;">Join Waitlist</button>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         11. FEATURES PATTERN
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">11 / Feature Rows</div>
+        <div class="ds-section-line"></div>
+
+        <div style="max-width: 500px;">
+            <div class="feature-row">
+                <div class="feature-icon">&gt;</div>
+                <div class="feature-text">
+                    <h4>One-click deploy</h4>
+                    <p>Run pawn deploy and your skill is live on the marketplace with a storefront, docs, and payment flow.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon">$</div>
+                <div class="feature-text">
+                    <h4>Instant monetization</h4>
+                    <p>We handle Stripe, subscriptions, and payouts. You set the price, we do the rest.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon">*</div>
+                <div class="feature-text">
+                    <h4>Universal subscription</h4>
+                    <p>Buyers pay once and get access to every agent on the platform. More reach for your work.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon">#</div>
+                <div class="feature-text">
+                    <h4>Zero infrastructure</h4>
+                    <p>No servers, no Docker, no CI/CD. We host and scale your agent automatically.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         12. TEXTURES & PATTERNS
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">12 / Textures</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">Subtle background patterns for depth without distraction.</p>
+
+        <div class="ds-grid ds-grid-2" style="gap: var(--sp-6);">
+            <div>
+                <div class="ds-label" style="margin-bottom: var(--sp-2);">Scanlines</div>
+                <div class="scanlines" style="height: 120px; background: var(--bg-surface); border: 1px solid var(--border-default);"></div>
+            </div>
+            <div>
+                <div class="ds-label" style="margin-bottom: var(--sp-2);">Grid</div>
+                <div class="grid-bg" style="height: 120px; background-color: var(--bg-surface); border: 1px solid var(--border-default);"></div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ==========================================
+         13. HERO COMPOSITION
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">13 / Hero Composition</div>
+        <div class="ds-section-line"></div>
+        <p class="ds-section-desc">Full hero section assembled from the design system components.</p>
+
+        <div class="hero-demo grid-bg">
+            <pre class="ascii-pawn">
+        _  _
+       ( `   )_
+      (    )    `)
+    (_   (_ .  _) _)
+           |
+           |
+         __|__
+        /     \
+       |       |
+        \_____/
+       /       \
+      |_________|
+     /___________\
+            </pre>
+            <h1>Ship your agent.<br><span class="accent">Get paid.</span></h1>
+            <p>One command to deploy your Claude skill to a global marketplace. We handle hosting, payments, and infrastructure.</p>
+            <div class="hero-ctas">
+                <button class="btn btn-primary btn-lg">List Your Agent <span class="kbd">L</span></button>
+                <button class="btn btn-secondary btn-lg">Explore Agents</button>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ==========================================
+         14. FOOTER COMPOSITION
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">14 / Footer Composition</div>
+        <div class="ds-section-line"></div>
+
+        <div class="footer-demo">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h5>Product</h5>
+                    <ul>
+                        <li><a href="#">Marketplace</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">CLI</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Creators</h5>
+                    <ul>
+                        <li><a href="#">Get Started</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Examples</a></li>
+                        <li><a href="#">Revenue Guide</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Legal</h5>
+                    <ul>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&#x265F; pawn &copy; 2025</span>
+                <span>Built for the agent economy</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         15. DESIGN PRINCIPLES
+         ========================================== -->
+    <section class="ds-section">
+        <div class="ds-section-title">15 / Design Principles</div>
+        <div class="ds-section-line"></div>
+
+        <div style="max-width: 600px;">
+            <div class="feature-row">
+                <div class="feature-icon" style="color: var(--fg-primary);">01</div>
+                <div class="feature-text">
+                    <h4>Terminal-native</h4>
+                    <p>Every element should feel like it belongs in a terminal. Monospace everywhere. Sharp edges. Dense information.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon" style="color: var(--fg-primary);">02</div>
+                <div class="feature-text">
+                    <h4>One accent only</h4>
+                    <p>Amber is the single warm color. It's used for: the cursor, CTAs, highlights, and the pawn ASCII art. Everything else is grayscale.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon" style="color: var(--fg-primary);">03</div>
+                <div class="feature-text">
+                    <h4>Show, don't tell</h4>
+                    <p>The terminal code block IS the hero. Show the deploy command. Show the output. The product sells itself.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon" style="color: var(--fg-primary);">04</div>
+                <div class="feature-text">
+                    <h4>Brutally minimal</h4>
+                    <p>No gradients, no shadows, no rounded corners. Borders are thin and subtle. Whitespace (blackspace) is the primary design tool.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon" style="color: var(--fg-primary);">05</div>
+                <div class="feature-text">
+                    <h4>Developer credibility</h4>
+                    <p>This is a tool for people who write code. The design should signal: "built by engineers, for engineers."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>

@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-void:      #0a0a0a;
+  --bg-surface:    #111111;
+  --bg-raised:     #1a1a1a;
+  --bg-elevated:   #222222;
+  --bg-hover:      #2a2a2a;
+
+  --fg-primary:    #e8e8e8;
+  --fg-secondary:  #999999;
+  --fg-muted:      #555555;
+  --fg-ghost:      #333333;
+
+  --accent:        #f59e0b;
+  --accent-dim:    #b45309;
+  --accent-glow:   rgba(245, 158, 11, 0.15);
+  --accent-bright: #fbbf24;
+
+  --success:       #22c55e;
+  --error:         #ef4444;
+  --info:          #3b82f6;
+
+  --border-subtle:  #1f1f1f;
+  --border-default: #2a2a2a;
+  --border-strong:  #444444;
+
+  --font-mono: var(--font-jetbrains), 'SF Mono', 'Fira Code', monospace;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg-void);
+  --color-foreground: var(--fg-primary);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-glow: var(--accent-glow);
+  --color-surface: var(--bg-surface);
+  --color-raised: var(--bg-raised);
+  --color-elevated: var(--bg-elevated);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-ghost: var(--fg-ghost);
+  --color-border: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-success: var(--success);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-void);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-void);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
+.grid-bg {
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
